@@ -1,0 +1,63 @@
+{% extends 'layout/layout.html' %} {% block title %}Pagos{% endblock %}
+{%block content %} {{ super() }}
+<h1>Registrar Pago<p>Asociado: {{user.name | capitalize }} {{user.last_name | capitalize }}</p>
+    <p>Fecha: {{ datetime.now().strftime("%d/%m/%y") }}</p>
+</h1>
+{% if pending %}
+<main class="section_table_and_disciplines">
+    <div class="info_container">
+        <p class="text_discipline">Disciplinas que realiza</p>
+        {% if disciplines %}
+            {% for d in disciplines %}
+                <li>{{ d.name | capitalize }} </li>
+            {% endfor %}
+        {% else %}
+        <p>-No hay disciclinas</p>
+        {% endif %}
+        <h2 class="text_pago">Total a pagar: ${{ total }} </h2>
+    </div>
+    <table class="index-table box">
+        <thead>
+            <tr>
+                <th class="name">Mes</th>
+                <th class="name">Abonar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in pending %}
+            <tr>
+                <th>{{ payment.mes.value }}</th>
+
+                {% if payment.state.value == 'Pagado' %}
+                <th>
+                    <button class="button_registarpago">
+                        <a href="#">
+                            Pagado</a>
+                    </button>
+                    <button class="button_registarpago">
+                        <a href="{{ url_for('payment.generate_voucher', id=user.id , id_pago=payment.id )}}">
+                            Emitir Compronte</a>
+                    </button>
+                </th>
+                    
+                {% else %}
+                     <th>
+                    <button class="button_registarpago">
+                        <a href="{{ url_for('payment.result', id=user.id , id_pago=payment.id )}}">Registrar
+                            Pago</a>
+                    </button>
+                </th>
+                {% endif %}
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% else %}
+<section class="containernotresult">
+    <img img class="notresultimg" src="{{ url_for('static', filename='images/feedback-animate.svg') }}" />
+    <span class="notresultext">No hay cuotas pendientes de pago</span>
+</section>
+{% endif %}
+{% endblock content %}

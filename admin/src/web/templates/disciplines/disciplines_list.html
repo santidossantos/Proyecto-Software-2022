@@ -1,0 +1,63 @@
+{% extends 'layout/layout.html' %} {% block title %}Disciplinas{% endblock %}
+{% block head %} {{super()}} {% endblock %}
+{%block content %} {{ super() }}
+{% if has_permission("discipline_new") %}
+  <button class="button_add mt-3">
+    <a href="{{ url_for('disciplines.create') }}">Nueva disciplina</a>
+  </button>
+{% endif %}
+<h1>Listado de disciplinas</h1>
+<section class="table-container">
+  <table class="index-table box">
+    <thead>
+      <tr>
+        <th class="name">Nombre</th>
+        <th class="name">Categoria</th>
+        <th class="name">Nombre insctructores</th>
+        <th class="name">Dias y horarios</th>
+        <th class="name">Cuota mensual</th>
+        <th class="name">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for discipline in disciplines.items %}
+      <tr>
+        <th>{{ discipline.name }}</th>
+        <th>{{ discipline.category }}</th>
+        <th>{{ discipline.nameInstructors}}</th>
+        <th>{{ discipline.daysAndHours }}</th>
+        <th>{{ discipline.monthlyCost}}</th>
+        <th>
+          <div>
+              {% if has_permission("discipline_new") %}
+                <a href="{{ url_for('disciplines.show', id=discipline.id )}}"><img class="icon" alt="Mas informacion" title="Mas informacion" src="{{ url_for('static', filename='images/discipline.svg') }}"/></a>
+              {% endif %}
+              {% if has_permission("discipline_update") %}
+                <a href="{{ url_for('disciplines.update', id=discipline.id )}}"><img class="icon" alt="editar" title="Editar" src="{{ url_for('static', filename='images/edit.svg') }}"/></a>
+              {% endif %}
+              {% if has_permission("discipline_destroy") %}
+                <a href="{{ url_for('disciplines.delete', id=discipline.id )}}" class="deleteconfirm"><img class="icon" alt="Eliminar" title="Eliminar" src="{{ url_for('static', filename='images/delete.svg') }}"/></a>
+              {% endif %}
+              {% if has_permission("discipline_new") %}
+                <a href="{{ url_for('inscription.inscription', id=discipline.id )}}"><img class="icon" alt="Realizar Inscripcion" title="Realizar Inscripcion" src="{{ url_for('static', filename='images/add.svg') }}"/></a>
+              {% endif %}
+              {%if  discipline.active == True %}
+              <a href="{{ url_for('disciplines.setStatus', id=discipline.id, desactivado=1) }}" class="activconfirm"><img class="icon" alt="Bloquear" title="Bloquear" src="{{ url_for('static', filename='images/on.svg') }}"/></a>
+              {% else %}
+              <a href="{{ url_for('disciplines.setStatus', id=discipline.id, desactivado=0) }}" class="bloqueoconfirm"><img class="icon" alt="Activar" title="Activar" src="{{ url_for('static', filename='images/off.svg') }}"/></a>
+              {% endif %}
+          </div>
+        </th>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<!-- Setteamos el objeto users que tiene los usuarios y a su vez la 
+paginacion  para enviarselos al template paginacion.html 
+que usa por defecto la variable  pagination_items -->
+{% set pagination_items = disciplines %} 
+{% set url_redirect = '/disciplines' %} 
+{% include'layout/pagination.html' %} 
+{% endblock content %}

@@ -1,0 +1,29 @@
+body{
+    background: #3b3b3b
+}
+h1{
+    color: rgb(241, 17, 17);
+    font-size: 4rem;
+    margin: 0;
+    padding-top: 4rem;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+.zoom-area{
+    font-size: 1.5rem;
+}
+
+.more-link{
+    text-decoration: none;
+    font-size: 1.5rem;
+    color: rgb(24, 184, 205);
+}
+
+p {
+    color: white
+}

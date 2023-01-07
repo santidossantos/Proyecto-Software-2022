@@ -1,0 +1,122 @@
+{% extends 'layout/layout.html' %}
+{% block title %}Asociados{% endblock %}
+{% block content %}
+{{ super() }}
+<h1>Listado de Asociados</h1>
+{% if has_permission("member_new") %}
+<button class="button_add">
+  <a href="{{ url_for('associates.create') }}">
+    <img alt="agregar" src="{{ url_for('static', filename='images/Adduser.png') }}" /> Agregar</a>
+</button>
+{% endif %}
+<form class="filter_user" action="" method="GET">
+  <input name="search_field" type="search" class="search-field" placeholder="Buscar por apellido..." {% if
+    request.args.get('search_field') %} value="{{ request.args.get('search_field') }}" {% endif %} />
+
+  <select name="active_filter" class="search-field cp">
+
+    {% if request.args.get('active_filter') == 'True' %}
+    <option value="True" selected>Activo</option>
+    <option value="False">Inactivo</option>
+    {% elif request.args.get('active_filter') == 'False'%}
+    <option value="False" selected>Inactivo</option>
+    <option value="True">Activo</option>
+    {% else %}
+    <option value="True">Activo</option>
+    <option value="False">Inactivo</option>
+    {% endif %}
+
+  </select>
+  <button type="submit" formaction="{{ url_for('associates.associate_index') }}" class="button_search">
+    Buscar
+  </button>
+  {% if associates.items %}
+  <button type="submit" formaction="{{ url_for('associates.call_csv_exporter') }}" class="button_exporter">
+    <input name="doc_type" value="csv" hidden />
+    <a>
+      <img alt="agregar" src="{{ url_for('static', filename='images/export_csv.png') }}">
+      Exportar CSV
+    </a>
+  </button>
+  <button type="submit" formaction="{{ url_for('associates.call_pdf_exporter') }}" class="button_exporter">
+    <input name="doc_type" value="pdf" hidden />
+    <a>
+      <img alt="agregar" src="{{ url_for('static', filename='images/pdf_export.png') }}">
+      Exportar PDF
+    </a>
+  </button>
+</form>
+<section class="table-container">
+  <table class="index-table box">
+    <thead>
+      <tr>
+        <th class="name">Nombre</th>
+        <th class="name">Apellido</th>
+        <th class="name">Email</th>
+        <th class="name">Dni</th>
+        <th class="name">Direccion</th>
+        <th class="name">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for associate in associates.items %}
+      {% if  (associate.active == True)  or (associate.active == False and (request.args.get('active_filter') == 'False') ) %}
+      <tr>
+        <th>{{ associate.name}}</th>
+        <th>{{ associate.last_name}}</th>
+        <th>{{ associate.email}}</th>
+        <th>{{ associate.dni}}</th>
+        <th>{{ associate.address}}</th>
+        <th>
+          {% if has_permission("member_show") %}
+          <a href="{{ url_for('associates.show', id=associate.id )}}"><img class="icon" alt="Mas informacion"
+              title="Mas informacion" src="{{ url_for('static', filename='images/info.svg') }}" /></a>
+          {% endif %}
+          {% if has_permission("member_update") %}
+          <a href="{{ url_for('associates.update', id=associate.id )}}"><img class="icon" alt="editar" title="Editar"
+              src="{{ url_for('static', filename='images/edit.svg') }}" /></a>
+          {% endif %}
+          {% if has_permission("member_destroy") %}
+              {% if (associate.active == False) %}
+              <a href="{{ url_for('associates.activate', id=associate.id )}}" class="deleteconfirm"><img class="icon" alt="Activar" title="Activar" src="{{ url_for('static', filename='images/off.svg') }}"/></a>
+              {% else %}
+                  <a href="{{ url_for('associates.delete', id=associate.id )}}" class="deleteconfirm"><img class="icon"
+                  alt="Eliminar" title="Desactivar" src="{{ url_for('static', filename='images/on.svg') }}" /></a>
+              {% endif %}
+          {% endif %}
+        </th>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<section class="containernotresult">
+  <img img class="notresultimg" src="{{ url_for('static', filename='images/feedback-animate.svg') }}" />
+  <span class="notresultext">No se encontraron resultados</span>
+</section>
+{% endif %}
+<!-- Setteamos el objeto users que tiene los usuarios y a su vez la 
+paginacion  para enviarselos al template paginacion.html 
+que usa por defecto la variable  pagination_items -->
+
+{% set base_url = '/associates' %}
+
+{% if request.args.get('search_field') %}
+{% set search = '?search_field=' + request.args.get('search_field') %}
+{% else %}
+{% set search = "?search_field=" %}
+{% endif %}
+
+
+{% if request.args.get('active_filter') %}
+{% set active = '&active_filter=' + request.args.get('active_filter') %}
+{% else %}
+{% set active = "" %}
+{% endif %}
+
+{% set pagination_items = associates %} {% set url_redirect = base_url %}
+{% include'layout/pagination.html' %}
+
+{% endblock content %}
